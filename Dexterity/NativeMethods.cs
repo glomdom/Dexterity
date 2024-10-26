@@ -1,11 +1,14 @@
 ﻿using System.Runtime.InteropServices;
+using System.Runtime.InteropServices.Marshalling;
 using System.Security.Cryptography.X509Certificates;
+using static Dexterity.NativeMethods;
 
 namespace Dexterity {
-    public static class NativeMethods {
+    public static partial class NativeMethods {
         public delegate IntPtr WNDPROC(IntPtr hWnd, uint uMsg, UIntPtr wParam, IntPtr lParam);
 
         [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)]
+        [CustomMarshaller(typeof(WNDCLASSA), MarshalMode.ManagedToUnmanagedIn, typeof(WNDCLASSAMarshaller))]
         public struct WNDCLASSA {
             public uint style;
             public WNDPROC lpfnWndProc;
@@ -20,6 +23,7 @@ namespace Dexterity {
         }
 
         [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)]
+        [CustomMarshaller(typeof(WNDCLASSEXA), MarshalMode.ManagedToUnmanagedIn, typeof(WNDCLASSEXAMarshaller))]
         public struct WNDCLASSEXA {
             public uint cbSize;
             public uint style;
@@ -52,50 +56,48 @@ namespace Dexterity {
             public uint lPrivate;
         }
 
-        [DllImport("user32.dll", CharSet = CharSet.Ansi, SetLastError = true)]
-        public static extern ushort RegisterClassA([In] ref WNDCLASSA windowClass);
+        [LibraryImport("user32.dll", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
+        public static partial ushort RegisterClassA(nint windowClass);
 
-        [DllImport("user32.dll", CharSet = CharSet.Ansi, SetLastError = true)]
-        public static extern ushort RegisterClassExA([In] ref WNDCLASSEXA windowClass);
+        [LibraryImport("user32.dll", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
+        public static partial ushort RegisterClassExA(nint windowClass);
 
-        [DllImport("user32.dll", CharSet = CharSet.Ansi, SetLastError = true)]
-        public static extern IntPtr DefWindowProcA(
-            [In] IntPtr hWnd,
-            [In] uint Msg,
-            [In] UIntPtr wParam,
-            [In] IntPtr lParam
+        [LibraryImport("user32.dll", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
+        public static partial IntPtr DefWindowProcA(IntPtr hWnd, uint Msg, UIntPtr wParam, IntPtr lParam);
+
+        [LibraryImport("user32.dll", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
+        public static partial IntPtr CreateWindowExA(
+            uint dwExStyle,
+            [Optional] string lpClassName,
+            [Optional] string lpWindowName,
+            uint dwStyle,
+            int X,
+            int Y,
+            int nWidth,
+            int nHeight,
+            [Optional] IntPtr hWndParent,
+            [Optional] IntPtr hMenu,
+            [Optional] IntPtr hInstance,
+            [Optional] IntPtr lpParam
         );
 
-        [DllImport("user32.dll", CharSet = CharSet.Ansi, SetLastError = true)]
-        public static extern IntPtr CreateWindowExA(
-            [In] uint dwExStyle,
-            [In] [Optional] string lpClassName,
-            [In] [Optional] string lpWindowName,
-            [In] uint dwStyle,
-            [In] int X,
-            [In] int Y,
-            [In] int nWidth,
-            [In] int nHeight,
-            [In] [Optional] IntPtr hWndParent,
-            [In] [Optional] IntPtr hMenu,
-            [In] [Optional] IntPtr hInstance,
-            [In] [Optional] IntPtr lpParam
-        );
+        [LibraryImport("user32.dll", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        public static partial bool ShowWindow(IntPtr hWnd, int nCmdShow);
 
-        [DllImport("user32.dll", CharSet = CharSet.Ansi, SetLastError = true)]
-        public static extern bool ShowWindow([In] IntPtr hWnd, int nCmdShow);
+        [LibraryImport("user32.dll", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
+        public static partial void PostQuitMessage(int nExitCode);
 
-        [DllImport("user32.dll", CharSet = CharSet.Ansi, SetLastError = true)]
-        public static extern void PostQuitMessage([In] int nExitCode);
+        [LibraryImport("user32.dll", EntryPoint = "GetMessageA", SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        public static partial bool GetMessage(ref MSG lpMsg, IntPtr hWnd, uint wMsgFilterMin, uint wMsgFilterMax);
 
-        [DllImport("user32.dll", CharSet = CharSet.Ansi, SetLastError = true)]
-        public static extern bool GetMessage(ref MSG lpMsg, [In] [Optional] IntPtr hWnd, [In] uint wMsgFilterMin, [In] uint wMsgFilterMax);
+        [LibraryImport("user32.dll", SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        public static partial bool TranslateMessage(ref MSG lpMsg);
 
-        [DllImport("user32.dll", CharSet = CharSet.Ansi, SetLastError = true)]
-        public static extern bool TranslateMessage([In] ref MSG lpMsg);
-
-        [DllImport("user32.dll", CharSet = CharSet.Ansi, SetLastError = true)]
-        public static extern IntPtr DispatchMessage([In] ref MSG lpMsg);
+        [LibraryImport("user32.dll", EntryPoint = "DispatchMessageA", SetLastError = true)]
+        public static partial IntPtr DispatchMessage(ref MSG lpMsg);
 
         public const ushort WM_DESTROY = 0x0002;
 
@@ -108,5 +110,49 @@ namespace Dexterity {
         public const int WS_OVERLAPPEDWINDOW = (WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME | WS_MINIMIZEBOX | WS_MAXIMIZEBOX);
 
         public const int CW_USEDEFAULT = unchecked((int)0x80000000);
+    }
+
+    public static class WNDCLASSAMarshaller {
+        public static nint ConvertToUnmanaged(WNDCLASSA managed) {
+            var unmanaged = Marshal.AllocHGlobal(Marshal.SizeOf<WNDCLASSA>());
+            Marshal.StructureToPtr(managed, unmanaged, false);
+            return unmanaged;
+        }
+
+        public static void Free(nint unmanaged) {
+            Marshal.FreeHGlobal(unmanaged);
+        }
+    }
+
+    public static class WNDCLASSEXAMarshaller {
+        public static nint ConvertToUnmanaged(WNDCLASSEXA managed) {
+            var unmanaged = Marshal.AllocHGlobal(Marshal.SizeOf<WNDCLASSEXA>());
+            Marshal.StructureToPtr(managed, unmanaged, false);
+            return unmanaged;
+        }
+
+        public static void Free(nint unmanaged) {
+            Marshal.FreeHGlobal(unmanaged);
+        }
+    }
+
+    public static class HelperMethods {
+        public static ushort RegisterClassExAHelper(WNDCLASSEXA windowClass) {
+            nint unmanaged = WNDCLASSEXAMarshaller.ConvertToUnmanaged(windowClass);
+            try {
+                return RegisterClassExA(unmanaged);
+            } finally {
+                WNDCLASSEXAMarshaller.Free(unmanaged);
+            }
+        }
+
+        public static ushort RegisterClassAHelper(WNDCLASSA windowClass) {
+            nint unmanaged = WNDCLASSAMarshaller.ConvertToUnmanaged(windowClass);
+            try {
+                return RegisterClassA(unmanaged);
+            } finally {
+                WNDCLASSAMarshaller.Free(unmanaged);
+            }
+        }
     }
 }

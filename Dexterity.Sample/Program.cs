@@ -27,7 +27,7 @@ internal static class Program {
             lpszClassName = className,
         };
 
-        RegisterClassExA(ref wc);
+        HelperMethods.RegisterClassExAHelper(wc);
 
         var hwnd = CreateWindowExA(
             0,
