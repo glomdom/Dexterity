@@ -105,5 +105,7 @@ namespace Dexterity {
         public const int WS_OVERLAPPEDWINDOW = (WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME | WS_MINIMIZEBOX | WS_MAXIMIZEBOX);
 
         public const int CW_USEDEFAULT = unchecked((int)0x80000000);
+
+        public const nint NULL = 0;
     }
 }

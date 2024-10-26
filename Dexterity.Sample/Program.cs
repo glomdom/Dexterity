@@ -1,6 +1,5 @@
 ﻿using System.ComponentModel;
 using System.Runtime.InteropServices;
-
 using Dexterity.UnmanagedTypes;
 using static Dexterity.NativeMethods;
 
@@ -40,17 +39,17 @@ internal static class Program {
             windowName,
             WS_OVERLAPPEDWINDOW,
             CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT,
-            IntPtr.Zero, IntPtr.Zero, hInstance, IntPtr.Zero
+            NULL, NULL, hInstance, NULL
         );
 
-        if (hwnd == IntPtr.Zero) {
+        if (hwnd == NULL) {
             throw new Win32Exception(Marshal.GetLastWin32Error(), "Failed to create window");
         }
 
         ShowWindow(hwnd, 1);
 
         var msg = new MSG();
-        while (GetMessage(ref msg, IntPtr.Zero, 0, 0) != false) {
+        while (GetMessage(ref msg, NULL, 0, 0) != false) {
             TranslateMessage(ref msg);
             DispatchMessage(ref msg);
         }
