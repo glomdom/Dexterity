@@ -10,7 +10,7 @@ internal static class Program {
             case WM_DESTROY:
                 PostQuitMessage(0);
 
-                return 0;
+                break;
         }
 
         return DefWindowProcA(hWnd, uMsg, wParam, lParam);
@@ -20,34 +20,41 @@ internal static class Program {
         var hInstance = Marshal.GetHINSTANCE(typeof(Program).Module);
         var className = "DexterityMainWindow";
 
+        var wndProcPtr = Marshal.GetFunctionPointerForDelegate((WNDPROC)WindowProc);
+        var classNamePtr = Marshal.StringToHGlobalAnsi(className);
+
         var wc = new WNDCLASSEXA {
             cbSize = (uint)Marshal.SizeOf<WNDCLASSEXA>(),
-            lpfnWndProc = WindowProc,
+            lpfnWndProc = wndProcPtr,
             hInstance = hInstance,
-            lpszClassName = className,
+            lpszClassName = classNamePtr,
         };
 
-        HelperMethods.RegisterClassExAHelper(wc);
+        try {
+            RegisterClassExA(ref wc);
 
-        var hwnd = CreateWindowExA(
-            0,
-            className,
-            "Dexterity",
-            WS_OVERLAPPEDWINDOW,
-            CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT,
-            IntPtr.Zero, IntPtr.Zero, hInstance, IntPtr.Zero
-        );
+            var hwnd = CreateWindowExA(
+                0,
+                classNamePtr,
+                Marshal.StringToHGlobalAnsi("Dexterity"),
+                WS_OVERLAPPEDWINDOW,
+                CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT,
+                IntPtr.Zero, IntPtr.Zero, hInstance, IntPtr.Zero
+            );
 
-        if (hwnd == IntPtr.Zero) {
-            throw new Win32Exception(Marshal.GetLastWin32Error(), "Failed to create window");
-        }
+            if (hwnd == IntPtr.Zero) {
+                throw new Win32Exception(Marshal.GetLastWin32Error(), "Failed to create window");
+            }
 
-        ShowWindow(hwnd, 1);
+            ShowWindow(hwnd, 1);
 
-        var msg = new MSG();
-        while (GetMessage(ref msg, IntPtr.Zero, 0, 0) != false) {
-            TranslateMessage(ref msg);
-            DispatchMessage(ref msg);
+            var msg = new MSG();
+            while (GetMessage(ref msg, IntPtr.Zero, 0, 0) != false) {
+                TranslateMessage(ref msg);
+                DispatchMessage(ref msg);
+            }
+        } finally {
+            Marshal.FreeHGlobal(classNamePtr);
         }
     }
 }

@@ -8,34 +8,32 @@ namespace Dexterity {
         public delegate IntPtr WNDPROC(IntPtr hWnd, uint uMsg, UIntPtr wParam, IntPtr lParam);
 
         [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)]
-        [CustomMarshaller(typeof(WNDCLASSA), MarshalMode.ManagedToUnmanagedIn, typeof(WNDCLASSAMarshaller))]
         public struct WNDCLASSA {
             public uint style;
-            public WNDPROC lpfnWndProc;
+            public nint lpfnWndProc;
             public int cbClsExtra;
             public int cbWndExtra;
             public IntPtr hInstance;
             public IntPtr hIcon;
             public IntPtr hCursor;
             public IntPtr hbrBackground;
-            public string lpszMenuName;
-            public string lpszClassName;
+            public nint lpszMenuName;
+            public nint lpszClassName;
         }
 
         [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)]
-        [CustomMarshaller(typeof(WNDCLASSEXA), MarshalMode.ManagedToUnmanagedIn, typeof(WNDCLASSEXAMarshaller))]
         public struct WNDCLASSEXA {
             public uint cbSize;
             public uint style;
-            public WNDPROC lpfnWndProc;
+            public nint lpfnWndProc;
             public int cbClsExtra;
             public int cbWndExtra;
             public IntPtr hInstance;
             public IntPtr hIcon;
             public IntPtr hCursor;
             public IntPtr hbrBackground;
-            public string lpszMenuName;
-            public string lpszClassName;
+            public nint lpszMenuName;
+            public nint lpszClassName;
             public IntPtr hIconSm;
         }
 
@@ -57,10 +55,10 @@ namespace Dexterity {
         }
 
         [LibraryImport("user32.dll", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
-        public static partial ushort RegisterClassA(nint windowClass);
+        public static partial ushort RegisterClassA(ref WNDCLASSA windowClass);
 
         [LibraryImport("user32.dll", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
-        public static partial ushort RegisterClassExA(nint windowClass);
+        public static partial ushort RegisterClassExA(ref WNDCLASSEXA windowClass);
 
         [LibraryImport("user32.dll", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
         public static partial IntPtr DefWindowProcA(IntPtr hWnd, uint Msg, UIntPtr wParam, IntPtr lParam);
@@ -68,8 +66,8 @@ namespace Dexterity {
         [LibraryImport("user32.dll", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
         public static partial IntPtr CreateWindowExA(
             uint dwExStyle,
-            [Optional] string lpClassName,
-            [Optional] string lpWindowName,
+            [Optional] nint lpClassName,
+            [Optional] nint lpWindowName,
             uint dwStyle,
             int X,
             int Y,
@@ -110,49 +108,5 @@ namespace Dexterity {
         public const int WS_OVERLAPPEDWINDOW = (WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME | WS_MINIMIZEBOX | WS_MAXIMIZEBOX);
 
         public const int CW_USEDEFAULT = unchecked((int)0x80000000);
-    }
-
-    public static class WNDCLASSAMarshaller {
-        public static nint ConvertToUnmanaged(WNDCLASSA managed) {
-            var unmanaged = Marshal.AllocHGlobal(Marshal.SizeOf<WNDCLASSA>());
-            Marshal.StructureToPtr(managed, unmanaged, false);
-            return unmanaged;
-        }
-
-        public static void Free(nint unmanaged) {
-            Marshal.FreeHGlobal(unmanaged);
-        }
-    }
-
-    public static class WNDCLASSEXAMarshaller {
-        public static nint ConvertToUnmanaged(WNDCLASSEXA managed) {
-            var unmanaged = Marshal.AllocHGlobal(Marshal.SizeOf<WNDCLASSEXA>());
-            Marshal.StructureToPtr(managed, unmanaged, false);
-            return unmanaged;
-        }
-
-        public static void Free(nint unmanaged) {
-            Marshal.FreeHGlobal(unmanaged);
-        }
-    }
-
-    public static class HelperMethods {
-        public static ushort RegisterClassExAHelper(WNDCLASSEXA windowClass) {
-            nint unmanaged = WNDCLASSEXAMarshaller.ConvertToUnmanaged(windowClass);
-            try {
-                return RegisterClassExA(unmanaged);
-            } finally {
-                WNDCLASSEXAMarshaller.Free(unmanaged);
-            }
-        }
-
-        public static ushort RegisterClassAHelper(WNDCLASSA windowClass) {
-            nint unmanaged = WNDCLASSAMarshaller.ConvertToUnmanaged(windowClass);
-            try {
-                return RegisterClassA(unmanaged);
-            } finally {
-                WNDCLASSAMarshaller.Free(unmanaged);
-            }
-        }
     }
 }
