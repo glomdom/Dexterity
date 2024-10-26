@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.11.35327.3
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dexterity", "Dexterity\Dexterity.csproj", "{EFC5C9EC-C644-4A5A-9F8C-3815A02C6DAF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dexterity.Sample", "Dexterity.Sample\Dexterity.Sample.csproj", "{656DE58F-6341-4C10-8AC1-7A5B81E1A4FC}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{EFC5C9EC-C644-4A5A-9F8C-3815A02C6DAF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EFC5C9EC-C644-4A5A-9F8C-3815A02C6DAF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EFC5C9EC-C644-4A5A-9F8C-3815A02C6DAF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EFC5C9EC-C644-4A5A-9F8C-3815A02C6DAF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{656DE58F-6341-4C10-8AC1-7A5B81E1A4FC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{656DE58F-6341-4C10-8AC1-7A5B81E1A4FC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{656DE58F-6341-4C10-8AC1-7A5B81E1A4FC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{656DE58F-6341-4C10-8AC1-7A5B81E1A4FC}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {0E92A341-0EA0-4A96-A61A-D648A52BE737}
+	EndGlobalSection
+EndGlobal
