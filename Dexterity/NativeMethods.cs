@@ -1,7 +1,4 @@
 ﻿using System.Runtime.InteropServices;
-using System.Runtime.InteropServices.Marshalling;
-using System.Security.Cryptography.X509Certificates;
-using static Dexterity.NativeMethods;
 
 namespace Dexterity {
     public static partial class NativeMethods {
